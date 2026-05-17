@@ -213,9 +213,9 @@ function SeraphSection({
             : 'Test connection'}
         </button>
       )}
-      {connState === 'err' && connError && (
+      {connState === 'err' && (
         <p style={{ marginTop: 4, fontSize: 10, color: '#f87171', wordBreak: 'break-all', lineHeight: 1.4 }}>
-          {connError}
+          {connError || 'Failed to fetch — check host URL and token'}
         </p>
       )}
     </div>
