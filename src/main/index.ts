@@ -9,6 +9,7 @@ import {
   desktopCapturer,
   screen,
   nativeTheme,
+  net,
 } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
@@ -255,6 +256,13 @@ function setupIPC(): void {
   })
 
   ipcMain.handle('window:hide', () => mainWindow?.hide())
+
+  ipcMain.handle('seraph:fetch', async (_, { host, token, path }: { host: string; token: string; path: string }) => {
+    const url = `${host}/api/v1${path}`
+    const res = await net.fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!res.ok) throw new Error(`Seraph API ${res.status}: ${path}`)
+    return res.json()
+  })
 
   ipcMain.handle('screenshot:capture', async () => {
     if (!mainWindow) return null

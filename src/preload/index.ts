@@ -24,6 +24,8 @@ const api = {
   hideWindow: (): Promise<void> => ipcRenderer.invoke('window:hide'),
   captureScreen: (): Promise<string | null> => ipcRenderer.invoke('screenshot:capture'),
   captureRegion: (): Promise<string | null> => ipcRenderer.invoke('screenshot:capture-region'),
+  seraphFetch: (host: string, token: string, path: string): Promise<unknown> =>
+    ipcRenderer.invoke('seraph:fetch', { host, token, path }),
   platform: process.platform as NodeJS.Platform,
 }
 

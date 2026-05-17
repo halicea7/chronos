@@ -124,12 +124,7 @@ function _normalizeHost(host: string): string {
 }
 
 async function _get<T>(host: string, token: string, path: string): Promise<T> {
-  const url = `${_normalizeHost(host)}/api/v1${path}`
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) throw new Error(`Seraph API ${res.status}: ${path}`)
-  return res.json() as Promise<T>
+  return window.api.seraphFetch(_normalizeHost(host), token, path) as Promise<T>
 }
 
 // ---------------------------------------------------------------------------
