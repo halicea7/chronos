@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { SeraphChipType } from '../lib/seraph'
 import {
-  fetchProjects, fetchFindings, fetchTargets, fetchScans,
-  fetchCredentials, fetchAttackPaths, fetchCveWatch, fetchReports,
+  fetchProjects, fetchFindings, fetchTargets,
+  fetchCredentials, fetchAttackPaths, fetchCveWatch,
 } from '../lib/seraph'
 
 // ── Category definitions ───────────────────────────────────────────────────
@@ -15,14 +15,12 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
+  { type: 'finding',     label: 'Findings',      icon: '⚠', requiresProject: false },
+  { type: 'target',      label: 'Hosts',         icon: '◎', requiresProject: true  },
+  { type: 'credential',  label: 'Credentials',   icon: '⊕', requiresProject: true  },
+  { type: 'attack_path', label: 'Attack Paths',  icon: '⇝', requiresProject: true  },
+  { type: 'cve',         label: 'CVE Watch',     icon: '⊘', requiresProject: false },
   { type: 'project',     label: 'Projects',      icon: '⬡', requiresProject: false },
-  { type: 'finding',     label: 'Findings',       icon: '⚠', requiresProject: false },
-  { type: 'target',      label: 'Hosts',          icon: '◎', requiresProject: true  },
-  { type: 'scan',        label: 'Scans',          icon: '⊛', requiresProject: false },
-  { type: 'credential',  label: 'Credentials',    icon: '⊕', requiresProject: true  },
-  { type: 'attack_path', label: 'Attack Paths',   icon: '⇝', requiresProject: true  },
-  { type: 'cve',         label: 'CVE Watch',      icon: '⊘', requiresProject: false },
-  { type: 'report',      label: 'Reports',        icon: '⊞', requiresProject: false },
 ]
 
 interface Item {
@@ -82,16 +80,6 @@ export function MentionDropdown({ host, token, query, onSelect, onClose }: Props
           raw = ts.map((t) => ({ id: t.id, label: t.hostname_or_ip, sublabel: t.target_type, data: t as unknown as Record<string, unknown> }))
           break
         }
-        case 'scan': {
-          const ss = await fetchScans(host, token, projectId)
-          raw = ss.map((s) => ({
-            id: s.id,
-            label: s.scan_type,
-            sublabel: [s.status, s.hostname_or_ip].filter(Boolean).join(' · '),
-            data: s as unknown as Record<string, unknown>,
-          }))
-          break
-        }
         case 'credential': {
           if (!projectId) break
           const cs = await fetchCredentials(host, token, projectId)
@@ -119,16 +107,7 @@ export function MentionDropdown({ host, token, query, onSelect, onClose }: Props
           }))
           break
         }
-        case 'report': {
-          const rs = await fetchReports(host, token, projectId)
-          raw = rs.map((r) => ({
-            id: r.id,
-            label: r.title ?? `Report ${r.id.slice(0, 8)}`,
-            sublabel: r.type ?? undefined,
-            data: r as unknown as Record<string, unknown>,
-          }))
-          break
-        }
+
       }
       setItems(raw)
     } catch {
@@ -162,8 +141,18 @@ export function MentionDropdown({ host, token, query, onSelect, onClose }: Props
     await loadItems(activeCategory, item.id)
   }
 
-  function selectItem(item: Item) {
-    onSelect(activeCategory!.type, item.label, item.data)
+  async function selectItem(item: Item) {
+    let data = item.data
+    if (activeCategory?.type === 'project') {
+      try {
+        const [targets, findings] = await Promise.all([
+          fetchTargets(host, token, item.id),
+          fetchFindings(host, token, item.id),
+        ])
+        data = { ...data, _targets: targets, _findings: findings }
+      } catch { /* use bare record */ }
+    }
+    onSelect(activeCategory!.type, item.label, data)
     onClose()
   }
 

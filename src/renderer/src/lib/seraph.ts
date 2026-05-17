@@ -203,11 +203,9 @@ export type SeraphChipType =
   | 'project'
   | 'finding'
   | 'target'
-  | 'scan'
   | 'credential'
   | 'attack_path'
   | 'cve'
-  | 'report'
 
 export interface SeraphChip {
   id: string             // unique chip id (not Seraph record id)
@@ -223,13 +221,21 @@ const SEVERITY_LABEL: Record<string, string> = {
 export function resolveChipContext(chip: SeraphChip): string {
   const d = chip.data
   switch (chip.type) {
-    case 'project':
+    case 'project': {
+      const targets = d._targets as Array<{ hostname_or_ip: string; target_type: string; ports?: string | null }> | undefined
+      const findings = d._findings as Array<{ severity: string; title: string }> | undefined
       return [
         `[SERAPH · Project]`,
         `Name: ${d.name}`,
         d.description ? `Description: ${d.description}` : null,
-        `Created: ${new Date(d.created_at as string).toLocaleDateString()}`,
+        targets?.length
+          ? `\nTargets (${targets.length}):\n${targets.map((t) => `  • ${t.hostname_or_ip} [${t.target_type}${t.ports ? ', ports: ' + t.ports : ''}]`).join('\n')}`
+          : null,
+        findings?.length
+          ? `\nFindings (${findings.length}):\n${findings.map((f) => `  [${(SEVERITY_LABEL[f.severity] ?? f.severity)}] ${f.title}`).join('\n')}`
+          : null,
       ].filter(Boolean).join('\n')
+    }
 
     case 'finding':
       return [
@@ -253,18 +259,6 @@ export function resolveChipContext(chip: SeraphChip): string {
         d.notes ? `Notes: ${d.notes}` : null,
       ].filter(Boolean).join('\n')
 
-    case 'scan':
-      return [
-        `[SERAPH · Scan]`,
-        `Type: ${d.scan_type}`,
-        `Module: ${d.module}`,
-        `Status: ${d.status}`,
-        d.hostname_or_ip ? `Host: ${d.hostname_or_ip}` : null,
-        d.completed_at
-          ? `Completed: ${new Date(d.completed_at as string).toLocaleString()}`
-          : `Started: ${d.started_at ? new Date(d.started_at as string).toLocaleString() : 'pending'}`,
-      ].filter(Boolean).join('\n')
-
     case 'credential':
       return [
         `[SERAPH · Credential]`,
@@ -276,14 +270,23 @@ export function resolveChipContext(chip: SeraphChip): string {
         `(Secret value withheld)`,
       ].filter(Boolean).join('\n')
 
-    case 'attack_path':
+    case 'attack_path': {
+      let steps: string | null = null
+      try {
+        const parsed = JSON.parse(d.steps_json as string) as unknown[]
+        if (Array.isArray(parsed) && parsed.length) {
+          steps = `\nSteps:\n${parsed.map((s, i) => `  ${i + 1}. ${typeof s === 'string' ? s : JSON.stringify(s)}`).join('\n')}`
+        }
+      } catch { /* no steps */ }
       return [
         `[SERAPH · Attack Path]`,
         `Title: ${d.title}`,
         `Severity: ${SEVERITY_LABEL[d.severity as string] ?? d.severity}`,
         `Status: ${d.status}`,
         d.description ? `\nDescription:\n${d.description}` : null,
+        steps,
       ].filter(Boolean).join('\n')
+    }
 
     case 'cve':
       return [
@@ -299,14 +302,6 @@ export function resolveChipContext(chip: SeraphChip): string {
             return cves.length ? `Known CVEs: ${cves.join(', ')}` : null
           } catch { return null }
         })(),
-      ].filter(Boolean).join('\n')
-
-    case 'report':
-      return [
-        `[SERAPH · Report]`,
-        d.title ? `Title: ${d.title}` : null,
-        d.type ? `Type: ${d.type}` : null,
-        `Generated: ${new Date(d.created_at as string).toLocaleDateString()}`,
       ].filter(Boolean).join('\n')
 
     default:
