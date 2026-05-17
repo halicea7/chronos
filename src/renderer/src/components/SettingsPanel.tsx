@@ -153,7 +153,7 @@ function SeraphSection({
     const result = await pingSeraph(settings.seraphHost.trim(), settings.seraphToken.trim())
     setConnState(result.ok ? 'ok' : 'err')
     setConnError(result.error ?? null)
-    setTimeout(() => setConnState('idle'), 5000)
+    setTimeout(() => setConnState('idle'), result.ok ? 5000 : 60000)
   }, [settings.seraphHost, settings.seraphToken])
 
   const connected = settings.seraphHost.trim() && settings.seraphToken.trim()
@@ -214,9 +214,14 @@ function SeraphSection({
         </button>
       )}
       {connState === 'err' && (
-        <p style={{ marginTop: 4, fontSize: 10, color: '#f87171', wordBreak: 'break-all', lineHeight: 1.4 }}>
+        <div style={{
+          marginTop: 6, padding: '6px 8px',
+          background: 'rgba(248,113,113,0.12)', border: '1px solid rgba(248,113,113,0.4)',
+          borderRadius: 6, fontSize: 10, color: '#f87171',
+          wordBreak: 'break-all', lineHeight: 1.5,
+        }}>
           {connError || 'Failed to fetch — check host URL and token'}
-        </p>
+        </div>
       )}
     </div>
   )
