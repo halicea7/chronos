@@ -144,13 +144,16 @@ function SeraphSection({
 }) {
   const [showToken, setShowToken] = useState(false)
   const [connState, setConnState] = useState<ConnState>('idle')
+  const [connError, setConnError] = useState<string | null>(null)
 
   const test = useCallback(async () => {
     if (!settings.seraphHost || !settings.seraphToken) return
     setConnState('testing')
-    const ok = await pingSeraph(settings.seraphHost.trim(), settings.seraphToken.trim())
-    setConnState(ok ? 'ok' : 'err')
-    setTimeout(() => setConnState('idle'), 3000)
+    setConnError(null)
+    const result = await pingSeraph(settings.seraphHost.trim(), settings.seraphToken.trim())
+    setConnState(result.ok ? 'ok' : 'err')
+    setConnError(result.error ?? null)
+    setTimeout(() => setConnState('idle'), 5000)
   }, [settings.seraphHost, settings.seraphToken])
 
   const connected = settings.seraphHost.trim() && settings.seraphToken.trim()
@@ -209,6 +212,11 @@ function SeraphSection({
             : connState === 'err' ? '✗ Unreachable'
             : 'Test connection'}
         </button>
+      )}
+      {connState === 'err' && connError && (
+        <p style={{ marginTop: 4, fontSize: 10, color: '#f87171', wordBreak: 'break-all', lineHeight: 1.4 }}>
+          {connError}
+        </p>
       )}
     </div>
   )

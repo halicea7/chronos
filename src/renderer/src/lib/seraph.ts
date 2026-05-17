@@ -136,13 +136,13 @@ async function _get<T>(host: string, token: string, path: string): Promise<T> {
 // Connection test
 // ---------------------------------------------------------------------------
 
-export async function pingSeraph(host: string, token: string): Promise<boolean> {
+export async function pingSeraph(host: string, token: string): Promise<{ ok: boolean; error?: string }> {
   try {
     await _get(host, token, '/auth/me')
-    return true
+    return { ok: true }
   } catch (err) {
-    console.warn('[Seraph] ping failed:', err)
-    return false
+    const msg = err instanceof Error ? err.message : String(err)
+    return { ok: false, error: msg }
   }
 }
 
