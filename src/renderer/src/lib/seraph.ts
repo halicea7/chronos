@@ -140,7 +140,8 @@ export async function pingSeraph(host: string, token: string): Promise<boolean> 
   try {
     await _get(host, token, '/auth/me')
     return true
-  } catch {
+  } catch (err) {
+    console.warn('[Seraph] ping failed:', err)
     return false
   }
 }
