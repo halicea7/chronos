@@ -288,7 +288,7 @@ export function SettingsPanel({ settings, onUpdate, onClose }: Props) {
               onChange={(e) => onUpdate('redTeamPrompt', e.target.value)}
               placeholder="Red team system prompt…"
             />
-            <label style={{ color: 'var(--c-accent)', fontWeight: 600 }}>Blue Team</label>
+            <label style={{ color: '#60a5fa', fontWeight: 600 }}>Blue Team</label>
             <textarea
               rows={4}
               value={settings.blueTeamPrompt}
