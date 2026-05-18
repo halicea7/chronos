@@ -106,7 +106,7 @@ function HotkeyRecorder({
     return () => window.removeEventListener('keydown', onKeyDown, true)
   }, [recording, onChange])
 
-  const chips = formatHotkey(value)
+  const chips = value ? formatHotkey(value) : []
 
   return (
     <button
@@ -117,12 +117,14 @@ function HotkeyRecorder({
     >
       {recording ? (
         <span className="chr-hotkey-prompt">Press shortcut…</span>
-      ) : (
+      ) : value ? (
         <span className="chr-hotkey-chips">
           {chips.map((chip, i) => (
             <kbd key={i} className="chr-hotkey-chip">{chip}</kbd>
           ))}
         </span>
+      ) : (
+        <span className="chr-hotkey-prompt">Not set</span>
       )}
       <span className="chr-hotkey-hint">
         {recording ? 'esc to cancel' : 'click to change'}

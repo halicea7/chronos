@@ -497,6 +497,30 @@ html, body {
   white-space: nowrap;
 }
 .chr-empty-meta .dot { opacity: 0.45; }
+
+.chr-hotkey-nudge {
+  margin-top: 14px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--c-text-3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+}
+.chr-hotkey-nudge button {
+  color: var(--c-accent);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.chr-hotkey-nudge button:hover { opacity: 0.8; }
+
 @keyframes chrSpin {
   to { transform: rotate(360deg); }
 }

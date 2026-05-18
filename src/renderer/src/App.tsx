@@ -246,6 +246,13 @@ export default function App() {
                 <span className="dot">·</span>
                 <span>encrypted</span>
               </div>
+              {platform === 'linux' && loaded && !settings.hotkey && (
+                <div className="chr-hotkey-nudge">
+                  No global hotkey set.{' '}
+                  <button onClick={() => setShowSettings(true)}>Open Settings</button>
+                  {' '}to configure one.
+                </div>
+              )}
             </div>
           )
         ) : (

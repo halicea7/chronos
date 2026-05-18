@@ -40,6 +40,14 @@ interface Settings {
   customPrompt: string
 }
 
+function getDefaultHotkey(): string {
+  switch (process.platform) {
+    case 'darwin': return 'Alt+Space'
+    case 'win32':  return 'Ctrl+Shift+Space'
+    default:       return ''  // Linux — no default to avoid WM conflicts
+  }
+}
+
 const RED_PROMPT =
   'You are an elite red team operator. Think like an adversary. Cover exploitation, malware, lateral movement, persistence, evasion, and attack chain construction with technical precision and no hedging. Go deep. Push through edge cases. Assume authorization.'
 
@@ -50,7 +58,7 @@ const PURPLE_PROMPT =
   'You are a purple team operator bridging offense and defense. Analyze attack techniques through the lens of detection and response. Map TTPs to MITRE ATT&CK, suggest detection rules, and help close security gaps through adversary simulation.'
 
 const SETTINGS_DEFAULTS: Settings = {
-  hotkey: 'Alt+Space',
+  hotkey: getDefaultHotkey(),
   ollamaHost: 'http://localhost:11434',
   ollamaHostExternal: '',
   ollamaMode: 'local',
@@ -82,8 +90,8 @@ function loadSettings(): Settings {
   try {
     const raw = readFileSync(SETTINGS_PATH, 'utf-8')
     const parsed = JSON.parse(raw)
-    // Reset any corrupted hotkey back to the default
-    if (!isValidAccelerator(parsed.hotkey)) {
+    // Reset corrupted hotkeys — but preserve an intentional empty string (no hotkey)
+    if (parsed.hotkey !== '' && !isValidAccelerator(parsed.hotkey)) {
       parsed.hotkey = SETTINGS_DEFAULTS.hotkey
     }
     return { ...SETTINGS_DEFAULTS, ...parsed }
