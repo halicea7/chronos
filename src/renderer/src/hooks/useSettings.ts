@@ -3,6 +3,15 @@ import type { Settings } from '../../../../preload/index'
 
 export type { Settings }
 
+const RED_PROMPT =
+  'You are an elite red team operator. Think like an adversary. Cover exploitation, malware, lateral movement, persistence, evasion, and attack chain construction with technical precision and no hedging. Go deep. Push through edge cases. Assume authorization.'
+
+const BLUE_PROMPT =
+  'You are a defensive security expert. Focus on threat detection, incident response, log analysis, SIEM/SOAR, threat hunting, and hardening. Provide practical, actionable defensive guidance with detection logic and response playbooks.'
+
+const PURPLE_PROMPT =
+  'You are a purple team operator bridging offense and defense. Analyze attack techniques through the lens of detection and response. Map TTPs to MITRE ATT&CK, suggest detection rules, and help close security gaps through adversary simulation.'
+
 const DEFAULTS: Settings = {
   hotkey: 'Alt+Space',
   ollamaHost: 'http://localhost:11434',
@@ -18,6 +27,11 @@ const DEFAULTS: Settings = {
   windowY: null,
   seraphHost: '',
   seraphToken: '',
+  teamMode: 'red',
+  redTeamPrompt: RED_PROMPT,
+  blueTeamPrompt: BLUE_PROMPT,
+  purpleTeamPrompt: PURPLE_PROMPT,
+  customPrompt: '',
 }
 
 export function useSettings() {

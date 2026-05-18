@@ -14,7 +14,7 @@ function uid() {
   return `msg-${Date.now()}-${++msgCounter}`
 }
 
-export function useChat(host: string, persistHistory: boolean) {
+export function useChat(host: string, persistHistory: boolean, systemPrompt?: string) {
   const [models, setModels] = useState<OllamaModel[]>([])
   const [selectedModel, setSelectedModel] = useState('')
   const [visionSupported, setVisionSupported] = useState(false)
@@ -36,6 +36,8 @@ export function useChat(host: string, persistHistory: boolean) {
   const abortRef = useRef<AbortController | null>(null)
   const messagesRef = useRef<Message[]>([])
   const historyLoadedRef = useRef(false)
+  const systemPromptRef = useRef(systemPrompt)
+  useEffect(() => { systemPromptRef.current = systemPrompt }, [systemPrompt])
 
   // -------------------------------------------------------------------------
   // History persistence
@@ -127,6 +129,9 @@ export function useChat(host: string, persistHistory: boolean) {
       const assistantMsg: Message = { id: uid(), role: 'assistant', content: '' }
 
       const history = [...messagesRef.current, userMsg]
+      const withSys: Message[] = systemPromptRef.current
+        ? [{ id: 'sys-0', role: 'system', content: systemPromptRef.current }, ...history]
+        : history
       setMsgs([...history, assistantMsg])
       setIsStreaming(true)
       const useThink = thinkingEnabled && thinkingSupported
@@ -159,7 +164,7 @@ export function useChat(host: string, persistHistory: boolean) {
       }
 
       try {
-        for await (const chunk of streamChat(host, selectedModel, history, controller.signal, useThink)) {
+        for await (const chunk of streamChat(host, selectedModel, withSys, controller.signal, useThink)) {
           pendingContent += chunk.content ?? ''
           if (chunk.thinking) pendingThinking += chunk.thinking
           if (!rafId) rafId = requestAnimationFrame(flush)

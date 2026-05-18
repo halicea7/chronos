@@ -31,7 +31,23 @@ interface Settings {
   variant: 'tactical' | 'carbon' | 'sentinel' | 'vault'
   windowX: number | null
   windowY: number | null
+  seraphHost: string
+  seraphToken: string
+  teamMode: 'red' | 'blue' | 'purple' | 'custom'
+  redTeamPrompt: string
+  blueTeamPrompt: string
+  purpleTeamPrompt: string
+  customPrompt: string
 }
+
+const RED_PROMPT =
+  'You are an elite red team operator. Think like an adversary. Cover exploitation, malware, lateral movement, persistence, evasion, and attack chain construction with technical precision and no hedging. Go deep. Push through edge cases. Assume authorization.'
+
+const BLUE_PROMPT =
+  'You are a defensive security expert. Focus on threat detection, incident response, log analysis, SIEM/SOAR, threat hunting, and hardening. Provide practical, actionable defensive guidance with detection logic and response playbooks.'
+
+const PURPLE_PROMPT =
+  'You are a purple team operator bridging offense and defense. Analyze attack techniques through the lens of detection and response. Map TTPs to MITRE ATT&CK, suggest detection rules, and help close security gaps through adversary simulation.'
 
 const SETTINGS_DEFAULTS: Settings = {
   hotkey: 'Alt+Space',
@@ -48,6 +64,11 @@ const SETTINGS_DEFAULTS: Settings = {
   windowY: null,
   seraphHost: '',
   seraphToken: '',
+  teamMode: 'red',
+  redTeamPrompt: RED_PROMPT,
+  blueTeamPrompt: BLUE_PROMPT,
+  purpleTeamPrompt: PURPLE_PROMPT,
+  customPrompt: '',
 }
 
 const SETTINGS_PATH = join(app.getPath('userData'), 'settings.json')

@@ -15,6 +15,11 @@ export type Settings = {
   windowY: number | null
   seraphHost: string   // e.g. "http://192.168.1.10:8000" — empty = disabled
   seraphToken: string  // "srph_..." API token
+  teamMode: 'red' | 'blue' | 'purple' | 'custom'
+  redTeamPrompt: string
+  blueTeamPrompt: string
+  purpleTeamPrompt: string
+  customPrompt: string
 }
 
 const api = {

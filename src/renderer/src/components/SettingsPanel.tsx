@@ -268,13 +268,6 @@ export function SettingsPanel({ settings, onUpdate, onClose }: Props) {
 
           <div className="chr-settings-section">
             <h3>Chat</h3>
-            <label>System prompt</label>
-            <textarea
-              rows={3}
-              value={settings.systemPrompt}
-              onChange={(e) => onUpdate('systemPrompt', e.target.value)}
-              placeholder="Optional system-level instructions…"
-            />
             <label className="chr-check-row">
               <input
                 type="checkbox"
@@ -283,6 +276,39 @@ export function SettingsPanel({ settings, onUpdate, onClose }: Props) {
               />
               <span>Persist history between sessions</span>
             </label>
+          </div>
+
+          <div className="chr-settings-section">
+            <h3>Team Mode prompts</h3>
+            <p className="chr-hint">Each mode injects its prompt silently at the start of every message. Switch modes mid-conversation to carry over context.</p>
+            <label style={{ color: 'var(--c-danger)', fontWeight: 600 }}>Red Team</label>
+            <textarea
+              rows={4}
+              value={settings.redTeamPrompt}
+              onChange={(e) => onUpdate('redTeamPrompt', e.target.value)}
+              placeholder="Red team system prompt…"
+            />
+            <label style={{ color: 'var(--c-accent)', fontWeight: 600 }}>Blue Team</label>
+            <textarea
+              rows={4}
+              value={settings.blueTeamPrompt}
+              onChange={(e) => onUpdate('blueTeamPrompt', e.target.value)}
+              placeholder="Blue team system prompt…"
+            />
+            <label style={{ color: '#a78bfa', fontWeight: 600 }}>Purple Team</label>
+            <textarea
+              rows={4}
+              value={settings.purpleTeamPrompt}
+              onChange={(e) => onUpdate('purpleTeamPrompt', e.target.value)}
+              placeholder="Purple team system prompt…"
+            />
+            <label style={{ fontWeight: 600 }}>Custom</label>
+            <textarea
+              rows={4}
+              value={settings.customPrompt}
+              onChange={(e) => onUpdate('customPrompt', e.target.value)}
+              placeholder="Define your own system prompt…"
+            />
           </div>
 
           <div className="chr-settings-section">

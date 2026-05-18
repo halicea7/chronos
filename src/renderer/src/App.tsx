@@ -9,6 +9,7 @@ import { resolveChipContext } from './lib/seraph'
 import { MessageBubble } from './components/MessageBubble'
 import { InputBar } from './components/InputBar'
 import { ModelPicker } from './components/ModelPicker'
+import { TeamModeSlider } from './components/TeamModeSlider'
 import { SettingsPanel } from './components/SettingsPanel'
 import { MoireBackground } from './components/MoireBackground'
 import { Sidebar } from './components/Sidebar'
@@ -37,12 +38,19 @@ export default function App() {
     ? (settings.ollamaMode === 'external' ? settings.ollamaHostExternal : settings.ollamaHost)
     : ''
 
+  const activeSystemPrompt = loaded
+    ? (settings.teamMode === 'red'    ? settings.redTeamPrompt
+       : settings.teamMode === 'blue'   ? settings.blueTeamPrompt
+       : settings.teamMode === 'purple' ? settings.purpleTeamPrompt
+       : settings.customPrompt)
+    : ''
+
   const {
     models, selectedModel, selectModel, visionSupported,
     thinkingSupported, thinkingEnabled, toggleThinking,
     messages, isStreaming, error, connected,
     send, cancel, clearHistory, loadMessages,
-  } = useChat(activeHost, settings.persistHistory)
+  } = useChat(activeHost, settings.persistHistory, activeSystemPrompt)
 
   const {
     conversations, activeId,
@@ -148,6 +156,11 @@ export default function App() {
           mode={settings.ollamaMode}
           externalHost={settings.ollamaHostExternal}
           onModeChange={(m) => update('ollamaMode', m)}
+        />
+
+        <TeamModeSlider
+          mode={settings.teamMode}
+          onModeChange={(m) => update('teamMode', m)}
         />
 
         <div className="chr-toolbar-spacer" />
